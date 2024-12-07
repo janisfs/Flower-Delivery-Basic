@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% extends 'my_flwr_dlvr/layout.html' %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+        <title>My Flower Delivery</title>
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+    {% include 'my_flwr_dlvr/nav.html' %}
+    <h1>My Flower Delivery</h1>
+    <p>Welcome to My Flower Delivery!</p>
+    {% include 'my_flwr_dlvr/footer.html' %}
+{% endblock %}
+
+</body>
+</html>
