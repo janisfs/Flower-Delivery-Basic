@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+# from django.http import HttpResponse
 
 # Create your views here.
 def index(request):
@@ -7,21 +7,21 @@ def index(request):
     return render(request, 'my_flwr_dlvr/index.html')
 
 
-def login_view(request):
+def login(request):
     # return HttpResponse("Login page.")
     return render(request, 'my_flwr_dlvr/login.html')
 
 
-def register_view(request):
+def register(request):
     # return HttpResponse("Register page.")
     return render(request, 'my_flwr_dlvr/register.html')
 
 
-def logout_view(request):
+def logout(request):
     # return HttpResponse("Logout page.")
-    return render(request, 'my_flwr_dlvr/logout.html')
+    return redirect(request, 'my_flwr_dlvr/index.html')
 
 
-def order_view(request):
+def order(request):
     # return HttpResponse("Order page.")
     return render(request, 'my_flwr_dlvr/order.html')
