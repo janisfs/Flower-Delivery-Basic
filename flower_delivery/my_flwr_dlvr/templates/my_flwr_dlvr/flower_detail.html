@@ -1,0 +1,55 @@
+{% extends 'my_flwr_dlvr/layout.html' %}
+
+<title>{% block title %}
+    {{ flower.title }}
+{% endblock %}</title>
+
+
+{% block content %}
+    <div class="container">
+        <!-- содержимое страницы flower_detail -->
+        <h1>{{ flower.title }}</h1>
+        <img src="{{ flower.image.url }}" alt="{{ flower.title }}">
+        <p>{{ flower.description | linebreaks }}</p>
+        <a href="#" class="btn btn-outline-info">Назад</a>
+        <br><br>
+        <div class="comments-section">
+            <h4>Комментарии</h4>
+            {% if comments %}
+                <ul class="list-group">
+                    {% for comment in comments %}
+                        <li class="list-group-item">
+                            <strong>{{ comment.author }}</strong>
+                            <p>{{ comment.text }}</p>
+                            <small class="text-muted">{{ comment.created_at }}</small>
+
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+            <br>
+            <div>
+                <p>Пока нет комментариев</p>
+            </div>
+            {% endif %}
+        </div>
+        <br><br>
+        <div class="comment-form">
+            <form method="post" action="{% url 'films:add_comment' film.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.author.label_tag }}
+                    {{ form.author }}
+                </div>
+                <div class="form-group">
+                    {{ form.text.label_tag }}
+                    {{ form.text }}
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+            </form>
+        </div>
+        <br>
+        <br>
+    </div>
+
+{% endblock %}

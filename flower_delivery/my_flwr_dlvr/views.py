@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import Flower
 # from django.http import HttpResponse
 
 # Create your views here.
@@ -25,3 +26,7 @@ def logout(request):
 def order(request):
     # return HttpResponse("Order page.")
     return render(request, 'my_flwr_dlvr/order.html')
+
+def flower_detail(request, pk):
+    flower = get_object_or_404(Flower, pk=pk)
+    return render(request, 'flower_detail.html', {'flower': flower})

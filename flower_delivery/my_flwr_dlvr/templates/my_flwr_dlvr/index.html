@@ -4,15 +4,41 @@
 <head>
     <meta charset="UTF-8">
     {% block title %}
-        <title>My Flower Delivery</title>
+        <title>Flowerbox</title>
     {% endblock %}
 </head>
 <body>
 {% block content %}
-
-    <h1>My Flower Delivery</h1>
-    <p>Welcome to My Flower Delivery!</p>
-
+  <!-- содержимое страницы Flowerbox -->
+    <!--<div class="container">-->
+        <div class="container py-2">
+            <h1 class="mb-4 text-center text-primary">Цветы и букеты</h1>
+        </div>
+        <div class="container mt-2">
+            <div class="row mt-4">
+                {% if flowers %}
+                    {% for flower in flowers %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card">
+                                {% if flower.image %}
+                                    <img src="#" alt="{{ flower.title }}">
+                                {% else %}
+                                    <p>Изображение не загружено</p>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ flower.title }}</h5>
+                                    <!--<p class="card-text">{{ flower.description }}</p>-->
+                                    <a href="#" class="btn btn-outline-info">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Нет цветов</p>
+                {% endif %}
+            </div>
+        </div>
+    <!--</div>-->
 {% endblock %}
 
 </body>
