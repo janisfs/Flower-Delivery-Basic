@@ -11,7 +11,7 @@ from .forms import ShippingAddressForm
 
 
 
-# Create your views here.
+# Главная страница
 def index(request):
     # products = Product.objects.all()  # Выбираем все товары, которые есть в базе данных
     # Вариант с фильтрацией по типу цветка
@@ -24,6 +24,7 @@ def index(request):
     return render(request, 'my_flower_del/index.html')
 
 
+# Вход в систему
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -43,11 +44,13 @@ def login(request):
     return render(request, 'my_flower_del/login.html', {'form': form})
 
 
+# Выход из системы
 def logout_view(request):
     logout(request)
     return redirect('index')
 
 
+# Регистрация
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -62,6 +65,7 @@ def register(request):
     return render(request, 'my_flower_del/register.html', {'form': form})
 
 
+# Корзина
 @login_required
 def checkout(request):
     cart_items = request.session.get('cart', {})
@@ -92,6 +96,7 @@ def checkout(request):
     return render(request, 'checkout.html', {'form': form, 'order': order})
 
 
+# Добавление товара в корзину
 def add_to_cart(request, product_id):
     cart = request.session.get('cart', {})
     cart[product_id] = cart.get(product_id, 0) + 1
@@ -99,21 +104,25 @@ def add_to_cart(request, product_id):
     return redirect('cart')
 
 
-
+# Подтверждение заказа
 def order_confirmation(request, order_id):
     order = Order.objects.get(id=order_id, user=request.user)
     return render(request, 'my_flower_del/order_confirmation.html', {'order': order})
 
 
+# Каталог
 def catalog(request):
      products = Product.objects.all()  # Выбираем все товары
      return render(request, 'index.html', {'products': products})  # Используем шаблон index.html
 
 
+# Детали товара
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)  # Находим товар по slug
     return render(request, 'product_detail.html', {'product': product})
 
+
+# Мой профиль
 def account(request):
     user = request.user
     return render(request, 'account.html')
