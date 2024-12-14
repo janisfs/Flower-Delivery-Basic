@@ -4,33 +4,40 @@
 <head>
     <meta charset="UTF-8">
     {% block title %}
-        <title>My Flower Delivery</title>
+        <title>Flower Box</title>
     {% endblock %}
 
 </head>
 <body>
     {% block content %}
-    <div class="container mt-4">
-        <h1>Каталог цветов</h1>
-
+        <div class="container mt-2">
+            <h1 class="mb-4 text-center text-primary">Добро пожаловать в Flower Box!</h1>
+        </div>
         <!-- Карточки товаров -->
-            <div class="row">
-                {% for product in products %}
-                <div class="col-md-4 mb-4">
-                    <div class="card" style="width: 18rem;">
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text">{{ product.description }}</p>
-                            <p class="card-text">Цена: {{ product.price }} ₽</p>
-                            <a href="#" class="btn btn-primary">Подробнее</a>
+        <div class="container mt-2">
+            <div class="container mt-4">
+                {% if products %}
+                    {% for product in products %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                {% else %}
+                                    <p>Изображение не загружено</p>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product.name }}</h5>
+                                    <p class="card-text">Цена: {{ product.price }} ₽</p>
+                                    <a href="#" class="btn btn-outline-info">Подробнее</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p>Нет доступных товаров.</p>
+                {% endif %}
             </div>
-    </div>
+        </div>
     {% endblock %}
 </body>
 </html>

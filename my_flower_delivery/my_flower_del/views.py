@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegisterForm
 from .forms import LoginForm, RegisterForm
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Product, Order, OrderItem
 from .forms import ShippingAddressForm
@@ -13,7 +13,7 @@ from .forms import ShippingAddressForm
 
 # Create your views here.
 def index(request):
-    products = Product.objects.all()  # Выбираем все товары, которые есть в базе данных
+    # products = Product.objects.all()  # Выбираем все товары, которые есть в базе данных
     # Вариант с фильтрацией по типу цветка
     # flower_type = request.GET.get('type')  # Получаем параметр фильтрации из URL
     # if flower_type:  # Если параметр есть, фильтруем товары
@@ -21,7 +21,7 @@ def index(request):
     # else:  # Иначе показываем все товары
     #     products = Product.objects.all()
 
-    return render(request, 'my_flower_del/index.html', {'products': products})
+    return render(request, 'my_flower_del/index.html')
 
 
 def login(request):
@@ -41,6 +41,11 @@ def login(request):
         form = LoginForm()
 
     return render(request, 'my_flower_del/login.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
 
 
 def register(request):
@@ -108,3 +113,7 @@ def catalog(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)  # Находим товар по slug
     return render(request, 'product_detail.html', {'product': product})
+
+def account(request):
+    user = request.user
+    return render(request, 'account.html')
