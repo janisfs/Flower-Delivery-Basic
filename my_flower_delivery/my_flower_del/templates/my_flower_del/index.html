@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+{% extends 'my_flower_del/layout.html' %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,27 @@
 </head>
 <body>
     {% block content %}
-        <h1>Добро пожаловать на домашнюю страницу!</h1>
-        <p>Это главная страница моего сайта.</p>
+    <div class="container mt-4">
+        <h1>Каталог цветов</h1>
+
+        <!-- Карточки товаров -->
+            <div class="row">
+                {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description }}</p>
+                            <p class="card-text">Цена: {{ product.price }} ₽</p>
+                            <a href="#" class="btn btn-primary">Подробнее</a>
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+            </div>
+    </div>
     {% endblock %}
 </body>
 </html>
