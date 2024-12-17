@@ -1,15 +1,23 @@
 # my_flower_delivery\my_flower_del\urls.py
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
-from .views import catalog  # Эта строка экспортирует функцию catalog
+
+app_name = 'my_flower_del'
 
 urlpatterns = [
     path('', views.index, name='index'),  # Главная страница с каталогом
     path('login/', views.login, name='login'),
     path('account/', views.account, name='account'),
     path('logout/', views.logout_view, name='logout'),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),  # Исправлено
     path('register/', views.register, name='register'),
     path('checkout/', views.checkout, name='checkout'),
+    path('<int:product_id>/', views.product_detail, name='product_detail'),
+    path('<int:product_id>/add_comment/', views.add_comment, name='add_comment'),
     path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
-    path('catalog/<slug:slug>/', views.product_detail, name='product_detail'),  # Детали товара
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

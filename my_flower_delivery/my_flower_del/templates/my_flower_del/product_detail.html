@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% extends 'my_flower_del/layout.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}
+    {{ product.name }}
+    {% endblock %}</title>
+</head>
+<body>
+    {% block content %}
+        <div class="container">
+            <!-- содержимое страницы products -->
+            <h1>{{ product.title }}</h1>
+            <img src="{{ product.image.url }}" alt="{{ product.title }}">
+            <p>{{ product.description | linebreaks }}</p>
+            <a href="{% url 'my_flower_del:index' %}" class="btn btn-outline-info">На Главную</a>
+            <br><br>
+            <form method="post" action="{% url 'my_flower_del:add_to_cart' product.id %}">
+                {% csrf_token %}
+                {{ add_to_cart_form.as_p }}
+                <button type="submit">Добавить в корзину</button>
+            </form>
+
+            <br><br>
+            <div class="comments-section">
+                <h4>Комментарии</h4>
+                {% if comments %}
+                    <ul class="list-group">
+                        {% for comment in comments %}
+                            <li class="list-group-item">
+                                <strong>{{ comment.author }}</strong>
+                                <p>{{ comment.text }}</p>
+                                <small class="text-muted">{{ comment.created_at }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                <br>
+                <div>
+                    <p>Пока нет комментариев</p>
+                </div>
+                {% endif %}
+            </div>
+            <br><br>
+            <div class="comment-form">
+                <form method="post" action="{% url 'my_flower_del:add_comment' product.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ comment_form.author.label_tag }}
+                        {{ comment_form.author }}
+                    </div>
+                    <div class="form-group">
+                        {{ comment_form.text.label_tag }}
+                        {{ comment_form.text }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+                </form>
+            </div>
+            <br>
+            <br>
+        </div>
+    {% endblock %}
+
+</body>
+</html>

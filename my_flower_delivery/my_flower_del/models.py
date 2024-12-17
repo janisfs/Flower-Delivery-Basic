@@ -1,8 +1,11 @@
 from django.db import models
 
 # Create your models here.
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+from datetime import datetime
+from django.utils.timezone import now
+from django import forms
 
 
 
@@ -10,23 +13,15 @@ class User(AbstractUser):  # Наследуем встроенную модел�
     email = models.EmailField(unique=True)  # Поле email становится уникальным
 
 
-# Сначала определяем Category и Product
-class Category(models.Model):
-    name = models.CharField(max_length=100, verbose_name="Название категории")
-    slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True, verbose_name="Описание категории")
-
-    class Meta:
-        verbose_name = "Категория"
-        verbose_name_plural = "Категории"
-
-    def __str__(self):
-        return self.name
 
 
 class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     slug = models.SlugField(unique=True)
+    stock = models.IntegerField(default=0)
+    available = models.BooleanField(default=True)
+    created = models.DateTimeField(default=now)
+    updated = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to="products/%Y/%m/%d", blank=True, verbose_name="Изображение")
     description = models.TextField(verbose_name="Описание")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
@@ -119,3 +114,40 @@ class Payment(models.Model):
     def __str__(self):
         return f'Payment {self.id} for Order {self.order.id}'
 
+
+class Comment(models.Model):
+    author = models.CharField('Автор', max_length=100)
+    text = models.TextField('Текст комментария')
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Продукт'
+    )
+    created_at = models.DateTimeField(
+        'Дата добавления',
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f'Комментарий от {self.author} к продукту {self.product.name}'
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']  # Добавим сортировку
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cart")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+
+
+class AddToCartForm(forms.Form):
+    quantity = forms.IntegerField(min_value=1, initial=1, label="Количество")
