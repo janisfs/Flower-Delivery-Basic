@@ -21,6 +21,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'my_flower_del:register' %}" {% if user.is_authenticated %} style="display: none;" {% endif %}>Регистрация</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'my_flower_del:cart' %}">Корзина</a>
+        </li>
       </ul>
       <form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">

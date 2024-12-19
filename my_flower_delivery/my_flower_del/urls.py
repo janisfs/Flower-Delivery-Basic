@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.index, name='index'),  # Главная страница с каталогом
     path('login/', views.login, name='login'),
     path('account/', views.account, name='account'),
+    path('cart/', views.cart, name='cart'),
     path('logout/', views.logout_view, name='logout'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),  # Исправлено
     path('register/', views.register, name='register'),

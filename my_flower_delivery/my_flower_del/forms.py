@@ -38,7 +38,12 @@ class CommentForm(forms.ModelForm):
 
 
 class AddToCartForm(forms.Form):
-    quantity = forms.IntegerField(min_value=1, initial=1, label="Количество")
+    quantity = forms.IntegerField(
+        min_value=1,
+        initial=1,
+        label='Количество',
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
 
 
 class CartForm(forms.ModelForm):

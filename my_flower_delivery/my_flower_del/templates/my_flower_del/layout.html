@@ -15,6 +15,7 @@
     {% include 'my_flower_del/nav.html' %}
     <!-- Подключаем контент -->
     <div class="container">
+        <h1>{% block page_title %}{% endblock %}</h1>
         {% block content %}
 
         {% endblock %}

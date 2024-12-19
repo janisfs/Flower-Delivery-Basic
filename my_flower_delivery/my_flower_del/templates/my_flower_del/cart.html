@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends 'my_flower_del/layout.html' %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+</head>
+<body>
+    {% block content %}
+        <div class="container py-2">
+            <h1>Корзина</h1>
+            <br>
+            <ul>
+                {% for item in cart_items %}
+                <li>
+                    {{ item.product.name }} ({{ item.quantity }} шт.)
+                    <span>Цена: {{ item.product.price }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <p>Общая стоимость: {{ cart_items.total_price }}</p>
+        </div>
+    {% endblock %}
+</body>
+</html>

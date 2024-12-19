@@ -3,23 +3,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}
-    {{ product.name }}
-    {% endblock %}</title>
+
 </head>
 <body>
     {% block content %}
-        <div class="container">
+        <div class="container py-2">
             <!-- содержимое страницы products -->
-            <h1>{{ product.title }}</h1>
+            <title>{% block title %} {{ product.name }} {% endblock %}</title>
             <img src="{{ product.image.url }}" alt="{{ product.title }}">
             <p>{{ product.description | linebreaks }}</p>
             <a href="{% url 'my_flower_del:index' %}" class="btn btn-outline-info">На Главную</a>
             <br><br>
             <form method="post" action="{% url 'my_flower_del:add_to_cart' product.id %}">
                 {% csrf_token %}
-                {{ add_to_cart_form.as_p }}
-                <button type="submit">Добавить в корзину</button>
+                <div class="form-group">
+                    {{ add_to_cart_form.quantity.label_tag }}
+                    {{ add_to_cart_form.quantity }}
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить в корзину</button>
             </form>
 
             <br><br>

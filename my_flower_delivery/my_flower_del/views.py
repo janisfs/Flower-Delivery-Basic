@@ -6,7 +6,7 @@ from .forms import RegisterForm
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Product, Order, OrderItem, Cart, Comment
+from .models import Product, Order, OrderItem, Cart, CartItem, Comment
 from .forms import ShippingAddressForm, AddToCartForm, CartForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -104,7 +104,6 @@ def checkout(request):
 
 # Добавление товара в корзину
 @login_required
-@login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -127,11 +126,13 @@ def add_to_cart(request, product_id):
                 cart_item.quantity += quantity
                 cart_item.save()
 
-            return redirect('product_detail', product_id=product_id)
+            # Изменено в соответствии с вашей структурой URL
+            return redirect('my_flower_del:product_detail', product_id=product_id)
     else:
         form = AddToCartForm()
 
-    return redirect('product_detail', product_id=product_id)
+    # Здесь тоже изменено
+    return redirect('my_flower_del:product_detail', product_id=product_id)
 
 
 # Подтверждение заказа
@@ -149,7 +150,7 @@ def catalog(request):
 # Детали товара
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    comments = product.comments.all()
+    comments = Comment.objects.filter(product=product)  # Получаем комментарии
 
     add_to_cart_form = AddToCartForm()
     comment_form = CommentForm()
@@ -160,17 +161,13 @@ def product_detail(request, product_id):
             if add_to_cart_form.is_valid():
                 quantity = add_to_cart_form.cleaned_data['quantity']
 
-                # Получаем или создаем корзину для пользователя
                 cart, _ = Cart.objects.get_or_create(user=request.user)
-
-                # Проверяем, есть ли уже такой товар в корзине
                 cart_item, created = CartItem.objects.get_or_create(
                     cart=cart,
                     product=product,
                     defaults={'quantity': quantity}
                 )
 
-                # Если товар уже был в корзине, увеличиваем количество
                 if not created:
                     cart_item.quantity += quantity
                     cart_item.save()
@@ -199,9 +196,6 @@ def product_detail(request, product_id):
     )
 
 
-
-
-
 # Мой профиль
 def account(request):
     user = request.user
@@ -220,3 +214,9 @@ def add_comment(request, product_id):
             return redirect('my_flower_del:product_detail', product_id=product_id)
     else:
         return redirect('my_flower_del:product_detail', product_id=product_id)
+
+
+# Корзина
+def cart(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    return render(request, 'my_flower_del/cart.html', {'cart_items': cart_items})
