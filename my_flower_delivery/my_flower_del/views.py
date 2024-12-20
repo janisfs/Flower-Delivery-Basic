@@ -1,14 +1,9 @@
-from django.shortcuts import render
-
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import RegisterForm
 from .forms import LoginForm, RegisterForm
 from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth.decorators import login_required
 from .models import Product, Order, OrderItem, Cart, CartItem, Comment
-from .forms import ShippingAddressForm, AddToCartForm, CartForm
-from django.http import HttpResponse
+from .forms import ShippingAddressForm, AddToCartForm
 from django.contrib.auth.decorators import login_required
 from .forms import CommentForm
 
@@ -39,10 +34,25 @@ def login(request):
     return render(request, 'my_flower_del/login.html', {'form': form})
 
 
+# Вход в систему
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('my_flower_del:index')  # Перенаправление после логина
+        else:
+            return render(request, 'registration/login.html', {'error': 'Неверный логин или пароль'})
+    return render(request, 'registration/login.html')
+
+
+
 # Выход из системы
 def logout_view(request):
     logout(request)
-    return redirect('index')
+    return redirect('my_flower_del:index')  # Перенаправление на главную страницу
 
 
 # Регистрация
@@ -52,12 +62,18 @@ def register(request):
         if form.is_valid():
             user = form.save()
             print(f"Создан новый пользователь: {user.username}")
+            # Проверяем статус пользователя
+            print(f"Пользователь активен: {user.is_active}")
             # Автоматически входим после регистрации
             auth_login(request, user)
-            return redirect('index')
+            return redirect('my_flower_del:login')
+        else:
+            # Логируем ошибки формы
+            print("Ошибки формы регистрации:", form.errors)
     else:
         form = RegisterForm()
     return render(request, 'my_flower_del/register.html', {'form': form})
+
 
 
 # Корзина
@@ -65,7 +81,7 @@ def register(request):
 def checkout(request):
     cart_items = request.session.get('cart', {})
     if not cart_items:
-        return redirect('cart')
+        return redirect('my_flower_del:cart')
 
     order = Order.objects.create(user=request.user, status='pending', total_amount=0)
 
@@ -93,7 +109,7 @@ def checkout(request):
             # Создаем корзину
             cart = Cart.objects.create(user=request.user)
 
-            return redirect('order_confirmation', order_id=order.id)
+            return redirect('my_flower_del:order_confirmation', order_id=order.id)
     else:
         shipping_form = ShippingAddressForm()
 
@@ -144,7 +160,7 @@ def order_confirmation(request, order_id):
 # Каталог
 def catalog(request):
      products = Product.objects.all()  # Выбираем все товары
-     return render(request, 'index.html', {'products': products})  # Используем шаблон index.html
+     return render(request, 'my_flower_del/index.html', {'products': products})  # Используем шаблон index.html
 
 
 # Детали товара
@@ -199,7 +215,7 @@ def product_detail(request, product_id):
 # Мой профиль
 def account(request):
     user = request.user
-    return render(request, 'account.html')
+    return render(request, 'my_flower_del/account.html')
 
 
 # Добавление комментария

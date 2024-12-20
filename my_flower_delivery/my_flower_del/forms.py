@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import (
     User,
     ShippingAddress,
-    Product,
     Comment,
     Cart,
     CartItem  # Добавляем импорт CartItem
