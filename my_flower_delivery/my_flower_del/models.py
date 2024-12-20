@@ -147,6 +147,9 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
 
+    @property
+    def total_price(self):
+        return self.quantity * self.product.price
 
 
 class AddToCartForm(forms.Form):

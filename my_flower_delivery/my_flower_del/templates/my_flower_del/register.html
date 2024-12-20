@@ -1,20 +1,27 @@
 <!DOCTYPE html>
+{% extends 'my_flower_del/layout.html' %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Регистрация</title>
+    {% block title %}
+        <title>Регистрация</title>
+    {% endblock %}
 </head>
 <body>
+    {% block content %}
+    <div class="container py-2">
+        <h1 class="mb-4 text-center text-primary">Регистрация</h1>
+    </div>
     <div class="container">
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <br>
-            <button type="submit">Регистрация</button>
+            <button type="submit" class="btn btn-outline-info">Регистрация</button>
         </form>
     </div>
-
-</form>
+    <br>
+    {% endblock %}
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% extends 'my_flower_del/layout.html' %}
+{% load cart_tags %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,19 +8,54 @@
 </head>
 <body>
     {% block content %}
-        <div class="container py-2">
-            <h1>Корзина</h1>
-            <br>
-            <ul>
+    <div class="container py-2">
+        <h1>Корзина</h1>
+        <br>
+        {% if cart_items %}
+            <ul class="list-group">
                 {% for item in cart_items %}
-                <li>
-                    {{ item.product.name }} ({{ item.quantity }} шт.)
-                    <span>Цена: {{ item.product.price }}</span>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ item.product.name }} ({{ item.quantity }} шт.)
+                        <span class="ms-3">Цена: {{ item.product.price }} руб.</span>
+                        <span class="ms-3">Сумма: {{ item.quantity|multiply:item.product.price }} руб.</span>
+                    </div>
+                    <form method="post" action="{% url 'my_flower_del:remove_from_cart' item.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm delete-item">Удалить</button>
+                    </form>
                 </li>
                 {% endfor %}
             </ul>
-            <p>Общая стоимость: {{ cart_items.total_price }}</p>
-        </div>
+            <p class="mt-3">Общая стоимость: {{ total_price }} руб.</p>
+            <form method="post" action="{% url 'my_flower_del:clear_cart' %}" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning clear-cart">Очистить корзину</button>
+            </form>
+        {% else %}
+            <p>Ваша корзина пуста</p>
+        {% endif %}
+    </div>
     {% endblock %}
+
+{% block extra_js %}
+<script>
+    // Подтверждение удаления отдельного товара
+    document.querySelectorAll('.delete-item').forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (!confirm('Вы уверены, что хотите удалить этот товар?')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Подтверждение очистки всей корзины
+    document.querySelector('.clear-cart')?.addEventListener('click', function(e) {
+        if (!confirm('Вы уверены, что хотите очистить корзину?')) {
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
 </body>
 </html>

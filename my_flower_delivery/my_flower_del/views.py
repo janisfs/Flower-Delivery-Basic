@@ -218,5 +218,30 @@ def add_comment(request, product_id):
 
 # Корзина
 def cart(request):
-    cart_items = Cart.objects.filter(user=request.user)
-    return render(request, 'my_flower_del/cart.html', {'cart_items': cart_items})
+    # Сначала получаем корзину пользователя
+    cart = Cart.objects.filter(user=request.user).first()
+    cart_items = []
+    total_price = 0
+
+    if cart:
+        # Получаем все items для этой корзины
+        cart_items = cart.items.all()  # используем related_name="items"
+        # Подсчитываем общую стоимость
+        total_price = sum(item.quantity * item.product.price for item in cart_items)
+
+    return render(request, 'my_flower_del/cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
+
+
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    cart_item.delete()
+    return redirect('my_flower_del:cart')
+
+def clear_cart(request):
+    cart = Cart.objects.filter(user=request.user).first()
+    if cart:
+        cart.items.all().delete()
+    return redirect('my_flower_del:cart')
