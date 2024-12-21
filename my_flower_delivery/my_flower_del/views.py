@@ -6,6 +6,7 @@ from .models import Product, Order, OrderItem, Cart, CartItem, Comment
 from .forms import ShippingAddressForm, AddToCartForm
 from django.contrib.auth.decorators import login_required
 from .forms import CommentForm
+from django.http import JsonResponse
 
 
 # Главная страница
@@ -25,7 +26,7 @@ def login(request):
             user = form.get_user()
             auth_login(request, user)
             print(f"Пользователь {user.username} успешно залогинен")
-            return redirect('index')
+            return redirect('my_flower_del:index')
         else:
             print("Ошибки формы:", form.errors)
     else:
@@ -142,12 +143,18 @@ def add_to_cart(request, product_id):
                 cart_item.quantity += quantity
                 cart_item.save()
 
-            # Изменено в соответствии с вашей структурой URL
-            return redirect('my_flower_del:product_detail', product_id=product_id)
+            # Возвращаем JSON-ответ вместо редиректа
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # Проверка на AJAX запрос
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Товар "{product.name}" успешно добавлен в корзину!'
+                })
+            else:
+                # Для обычного POST-запроса делаем редирект как раньше
+                return redirect('my_flower_del:product_detail', product_id=product_id)
     else:
         form = AddToCartForm()
 
-    # Здесь тоже изменено
     return redirect('my_flower_del:product_detail', product_id=product_id)
 
 

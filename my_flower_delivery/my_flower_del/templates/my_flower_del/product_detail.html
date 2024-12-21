@@ -7,63 +7,93 @@
 </head>
 <body>
     {% block content %}
-        <div class="container py-2">
-            <!-- содержимое страницы products -->
-            <title>{% block title %} {{ product.name }} {% endblock %}</title>
-            <img src="{{ product.image.url }}" alt="{{ product.title }}">
-            <p>{{ product.description | linebreaks }}</p>
-            <a href="{% url 'my_flower_del:index' %}" class="btn btn-outline-info">На Главную</a>
-            <br><br>
-            <form method="post" action="{% url 'my_flower_del:add_to_cart' product.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ add_to_cart_form.quantity.label_tag }}
-                    {{ add_to_cart_form.quantity }}
-                </div>
-                <br>
-                <button type="submit" class="btn btn-outline-info">Добавить в корзину</button>
-            </form>
-
-            <br><br>
-            <div class="comments-section">
-                <h4>Комментарии</h4>
-                {% if comments %}
-                    <ul class="list-group">
-                        {% for comment in comments %}
-                            <li class="list-group-item">
-                                <strong>{{ comment.author }}</strong>
-                                <p>{{ comment.text }}</p>
-                                <small class="text-muted">{{ comment.created_at }}</small>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                <br>
-                <div>
-                    <p>Пока нет комментариев</p>
-                </div>
-                {% endif %}
+        <div class="row">
+            <div class="col-md-6 mt-5">
+                <!-- содержимое страницы products -->
+                <title>{% block title %} {{ product.name }} {% endblock %}</title>
+                <img src="{{ product.image.url }}" alt="{{ product.title }}">
             </div>
-            <br><br>
-            <div class="comment-form">
-                <form method="post" action="{% url 'my_flower_del:add_comment' product.id %}">
+            <div class="col-md-6 mt-5">
+                <h1>{{ product.name }}</h1>
+                <p>{{ product.description | linebreaks }}</p>
+                <br><br>
+                <form method="post" action="{% url 'my_flower_del:add_to_cart' product.id %}">
                     {% csrf_token %}
                     <div class="form-group">
-                        {{ comment_form.author.label_tag }}
-                        {{ comment_form.author }}
-                    </div>
-                    <div class="form-group">
-                        {{ comment_form.text.label_tag }}
-                        {{ comment_form.text }}
+                        {{ add_to_cart_form.quantity.label_tag }}
+                        {{ add_to_cart_form.quantity }}
                     </div>
                     <br>
-                    <button type="submit" class="btn btn-outline-info">Добавить комментарий</button>
+                    <button type="submit" class="btn btn-outline-info">Добавить в корзину</button>
                 </form>
+                <br>
+                <a href="{% url 'my_flower_del:index' %}" class="btn btn-outline-info">На Главную</a>
+            </div>
+            <div class="col-md-12 mt-5">
+                <div class="comments-section">
+                    <h4>Комментарии</h4>
+                    {% if comments %}
+                        <ul class="list-group">
+                            {% for comment in comments %}
+                                <li class="list-group-item">
+                                    <strong>{{ comment.author }}</strong>
+                                    <p>{{ comment.text }}</p>
+                                    <small class="text-muted">{{ comment.created_at }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                    <br>
+                    <div>
+                        <p>Пока нет комментариев</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <br><br>
+                <div class="comment-form">
+                    <form method="post" action="{% url 'my_flower_del:add_comment' product.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ comment_form.author.label_tag }}
+                            {{ comment_form.author }}
+                        </div>
+                        <div class="form-group">
+                            {{ comment_form.text.label_tag }}
+                            {{ comment_form.text }}
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-outline-info">Добавить комментарий</button>
+                    </form>
+                </div>
             </div>
             <br>
             <br>
         </div>
     {% endblock %}
+    <script>
+    document.querySelector('.add-to-cart-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);  // или более красивое уведомление
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при добавлении товара в корзину');
+        });
+    });
+    </script>
 
 </body>
 </html>

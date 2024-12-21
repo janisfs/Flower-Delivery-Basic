@@ -8,6 +8,7 @@ from .models import (
     CartItem  # Добавляем импорт CartItem
 )
 
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -39,9 +40,10 @@ class CommentForm(forms.ModelForm):
 class AddToCartForm(forms.Form):
     quantity = forms.IntegerField(
         min_value=1,
-        initial=1,
-        label='Количество',
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control small-input',
+            'style': 'width: 70px;'  # или любое другое значение
+        })
     )
 
 
