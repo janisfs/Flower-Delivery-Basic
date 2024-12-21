@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-{% extends 'my_flower_del/layout.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
 
-</head>
-<body>
+{% extends 'my_flower_del/layout.html' %}
+
+
     {% block content %}
         <div class="row">
             <div class="col-md-6 mt-5">
                 <!-- содержимое страницы products -->
-                <title>{% block title %} {{ product.name }} {% endblock %}</title>
+                <!--{% block title %} {{ product.name }} {% endblock %}-->
                 <img src="{{ product.image.url }}" alt="{{ product.title }}">
             </div>
             <div class="col-md-6 mt-5">
@@ -95,5 +91,3 @@
     });
     </script>
 
-</body>
-</html>

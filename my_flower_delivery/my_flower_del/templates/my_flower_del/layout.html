@@ -14,13 +14,22 @@
     <!-- Подключаем меню -->
     {% include 'my_flower_del/nav.html' %}
     <!-- Подключаем контент -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} h4 alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="container">
         <h1>{% block page_title %}{% endblock %}</h1>
         {% block content %}
 
         {% endblock %}
     </div>
-
 
 
 <!-- Подключаем подвал -->

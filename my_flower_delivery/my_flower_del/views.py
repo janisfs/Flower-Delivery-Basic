@@ -7,6 +7,7 @@ from .forms import ShippingAddressForm, AddToCartForm
 from django.contrib.auth.decorators import login_required
 from .forms import CommentForm
 from django.http import JsonResponse
+from django.contrib import messages
 
 
 # Главная страница
@@ -85,49 +86,29 @@ def account(request):
 # Корзина
 @login_required
 def checkout(request):
-    # Получаем корзину пользователя
-    cart = Cart.objects.filter(user=request.user).first()
-
-    if not cart or not cart.items.exists():
-        # Если корзина пуста, перенаправляем на страницу корзины
-        return redirect('my_flower_del:cart')
-
-    # Создаем заказ
-    order = Order.objects.create(user=request.user, status='pending', total_amount=0)
-
-    total_amount = 0
-    for item in cart.items.all():
-        # Переносим товары из корзины в заказ
-        OrderItem.objects.create(
-            order=order,
-            product=item.product,
-            quantity=item.quantity,
-            price=item.product.price,
-        )
-        total_amount += item.quantity * item.product.price
-
-    # Обновляем сумму заказа
-    order.total_amount = total_amount
-    order.save()
-
     if request.method == 'POST':
-        shipping_form = ShippingAddressForm(request.POST)
-        if shipping_form.is_valid():
-            shipping_address = shipping_form.save(commit=False)
-            shipping_address.order = order
-            shipping_address.save()
+        try:
+            # Получаем активный заказ пользователя
+            order = Order.objects.filter(user=request.user, status='pending').latest('created_at')
 
-            # Очистка корзины
-            cart.items.all().delete()
+            # Обновляем статус заказа
+            order.status = 'paid'
+            order.save()
 
-            return redirect('my_flower_del:order_confirmation', order_id=order.id)
-    else:
-        shipping_form = ShippingAddressForm()
+            # Формируем более информативное сообщение
+            success_message = (
+                f'Заказ №{order.id} успешно оформлен! '
+                f'Статус заказа: {order.get_status_display()}'
+            )
+            messages.success(request, success_message)
 
-    return render(request, 'my_flower_del/checkout.html', {
-        'form': shipping_form,
-        'order': order,
-    })
+            return redirect('my_flower_del:index')
+
+        except Order.DoesNotExist:
+            messages.error(request, 'Заказ не найден')
+            return redirect('my_flower_del:cart')
+
+    return redirect('my_flower_del:cart')
 
 
 
@@ -170,19 +151,49 @@ def add_to_cart(request, product_id):
     return redirect('my_flower_del:product_detail', product_id=product_id)
 
 
-# Подтверждение заказа
-def order_confirmation(request):
-    # Получаем текущего пользователя и его корзину
-    user_cart = CartItem.objects.filter(user=request.user)
 
-    if not user_cart.exists():
-        return redirect('cart')  # Если корзина пуста, возвращаемся на страницу корзины
+# views.py
+def create_order(request):
+    if request.method == 'POST':
+        cart = Cart.objects.filter(user=request.user).first()
+        if cart and cart.items.exists():
+            # Создаем новый заказ
+            total_amount = sum(item.quantity * item.product.price for item in cart.items.all())
+            order = Order.objects.create(
+                user=request.user,
+                total_amount=total_amount
+            )
 
-    context = {
-        'cart_items': user_cart,
-        'total': sum(item.product.price * item.quantity for item in user_cart)
-    }
-    return render(request, 'my_flower_del/order_confirmation.html', context)
+            # Создаем элементы заказа
+            for cart_item in cart.items.all():
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    quantity=cart_item.quantity,
+                    price=cart_item.product.price
+                )
+
+            # Очищаем корзину
+            cart.items.all().delete()
+
+            return redirect('my_flower_del:order_confirmation', order_id=order.id)
+    return redirect('my_flower_del:cart')
+
+
+def order_confirmation(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        order_items = order.items.all()
+        total = sum(item.price * item.quantity for item in order_items)
+
+        context = {
+            'cart_items': order_items,  # переименовали для совместимости с шаблоном
+            'total': total,
+            'order': order
+        }
+        return render(request, 'my_flower_del/order_confirmation.html', context)
+    except Order.DoesNotExist:
+        return redirect('my_flower_del:cart')
 
 
 # Каталог

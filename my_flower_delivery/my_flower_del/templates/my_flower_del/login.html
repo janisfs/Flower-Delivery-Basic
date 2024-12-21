@@ -1,13 +1,11 @@
-<!DOCTYPE html>
+
 {% extends 'my_flower_del/layout.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+
     {% block title %}
         <title>Вход</title>
     {% endblock %}
-</head>
-<body>
+
+
     {% block content %}
         <div class="container">
             <form method="post" action="{% url 'my_flower_del:login' %}">
@@ -35,5 +33,3 @@
         </div>
     {% endblock %}
 
-</body>
-</html>

@@ -61,7 +61,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def get_total_price(self):
+    @property
+    def total_price(self):
         return self.quantity * self.price
 
     def __str__(self):
