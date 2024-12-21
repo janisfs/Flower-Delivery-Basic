@@ -76,27 +76,37 @@ def register(request):
     return render(request, 'my_flower_del/register.html', {'form': form})
 
 
+# Мой профиль
+def account(request):
+    user = request.user
+    return render(request, 'my_flower_del/account.html')
+
 
 # Корзина
 @login_required
 def checkout(request):
-    cart_items = request.session.get('cart', {})
-    if not cart_items:
+    # Получаем корзину пользователя
+    cart = Cart.objects.filter(user=request.user).first()
+
+    if not cart or not cart.items.exists():
+        # Если корзина пуста, перенаправляем на страницу корзины
         return redirect('my_flower_del:cart')
 
+    # Создаем заказ
     order = Order.objects.create(user=request.user, status='pending', total_amount=0)
 
     total_amount = 0
-    for product_id, quantity in cart_items.items():
-        product = Product.objects.get(id=product_id)
-        order_item = OrderItem.objects.create(
+    for item in cart.items.all():
+        # Переносим товары из корзины в заказ
+        OrderItem.objects.create(
             order=order,
-            product=product,
-            quantity=quantity,
-            price=product.price
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.price,
         )
-        total_amount += product.price * quantity
+        total_amount += item.quantity * item.product.price
 
+    # Обновляем сумму заказа
     order.total_amount = total_amount
     order.save()
 
@@ -107,8 +117,8 @@ def checkout(request):
             shipping_address.order = order
             shipping_address.save()
 
-            # Создаем корзину
-            cart = Cart.objects.create(user=request.user)
+            # Очистка корзины
+            cart.items.all().delete()
 
             return redirect('my_flower_del:order_confirmation', order_id=order.id)
     else:
@@ -116,7 +126,9 @@ def checkout(request):
 
     return render(request, 'my_flower_del/checkout.html', {
         'form': shipping_form,
+        'order': order,
     })
+
 
 
 # Добавление товара в корзину
@@ -159,9 +171,18 @@ def add_to_cart(request, product_id):
 
 
 # Подтверждение заказа
-def order_confirmation(request, order_id):
-    order = Order.objects.get(id=order_id, user=request.user)
-    return render(request, 'my_flower_del/order_confirmation.html', {'order': order})
+def order_confirmation(request):
+    # Получаем текущего пользователя и его корзину
+    user_cart = CartItem.objects.filter(user=request.user)
+
+    if not user_cart.exists():
+        return redirect('cart')  # Если корзина пуста, возвращаемся на страницу корзины
+
+    context = {
+        'cart_items': user_cart,
+        'total': sum(item.product.price * item.quantity for item in user_cart)
+    }
+    return render(request, 'my_flower_del/order_confirmation.html', context)
 
 
 # Каталог
@@ -219,26 +240,6 @@ def product_detail(request, product_id):
     )
 
 
-# Мой профиль
-def account(request):
-    user = request.user
-    return render(request, 'my_flower_del/account.html')
-
-
-# Добавление комментария
-def add_comment(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.product = product  # Связываем комментарий с продуктом
-            comment.save()
-            return redirect('my_flower_del:product_detail', product_id=product_id)
-    else:
-        return redirect('my_flower_del:product_detail', product_id=product_id)
-
-
 # Корзина
 def cart(request):
     # Сначала получаем корзину пользователя
@@ -263,8 +264,23 @@ def remove_from_cart(request, item_id):
     cart_item.delete()
     return redirect('my_flower_del:cart')
 
+
 def clear_cart(request):
     cart = Cart.objects.filter(user=request.user).first()
     if cart:
         cart.items.all().delete()
     return redirect('my_flower_del:cart')
+
+
+# Добавление комментария
+def add_comment(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.product = product  # Связываем комментарий с продуктом
+            comment.save()
+            return redirect('my_flower_del:product_detail', product_id=product_id)
+    else:
+        return redirect('my_flower_del:product_detail', product_id=product_id)

@@ -1,15 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation</title>
-</head>
-<body>
-    <h2>Оформление заказа</h2>
-    <div class="container">
-        <p>Номер заказа: {{ order.id }}</p>
-        <p>Сумма: {{ order.total_amount }} руб.</p>
-    </div>
+<!--order_confirmation.html-->
+{% extends 'my_flower_del/layout.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="container py-4">
+    <h1>Подтверждение заказа</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.product.price }}</td>
+                <td>{{ item.product.price|multiply:item.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>Итоговая сумма: {{ total }} руб.</p>
+
+    <form method="post" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Подтвердить заказ</button>
+    </form>
+    <a href="{% url 'my_flower_del:index' %}" class="btn btn-primary">Вернуться на главную</a>
+</div>
+{% endblock %}

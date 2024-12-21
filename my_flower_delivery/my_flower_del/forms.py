@@ -25,6 +25,9 @@ class ShippingAddressForm(forms.ModelForm):
     class Meta:
         model = ShippingAddress
         fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'postal_code', 'city', 'country']
+        widgets = {
+            'address': forms.Textarea(attrs={'rows': 2}),
+        }
 
 
 class CommentForm(forms.ModelForm):
@@ -42,8 +45,9 @@ class AddToCartForm(forms.Form):
         min_value=1,
         widget=forms.NumberInput(attrs={
             'class': 'form-control small-input',
-            'style': 'width: 70px;'  # или любое другое значение
-        })
+            'style': 'width: 70px;'
+        }),
+        label='Количество'
     )
 
 

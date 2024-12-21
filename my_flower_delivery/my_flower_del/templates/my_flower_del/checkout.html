@@ -1,18 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Заказ</title>
-</head>
-<body>
-    <div class="container">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <br>
-            <button type="submit">Заказать</button>
-        </form>
-    </div>
+<!--checkout.html-->
+{% extends 'my_flower_del/layout.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="container py-4">
+    <h1>Оформление заказа</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Подтвердить заказ</button>
+    </form>
+</div>
+{% endblock %}
