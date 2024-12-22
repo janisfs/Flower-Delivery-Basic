@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout
 from .models import Product, Order, OrderItem, Cart, CartItem, Comment
 from .forms import ShippingAddressForm, AddToCartForm
 from django.contrib.auth.decorators import login_required
-from .forms import CommentForm
+from .forms import CommentForm, DeliveryForm
 from django.http import JsonResponse
 from django.contrib import messages
 
@@ -47,6 +47,8 @@ def login_view(request):
             return redirect('my_flower_del:index')  # Перенаправление после логина
         else:
             return render(request, 'registration/login.html', {'error': 'Неверный логин или пароль'})
+    elif not request.user.is_authenticated:
+        return redirect('my_flower_del:index')  # Перенаправление на главную для анонимных пользователей
     return render(request, 'registration/login.html')
 
 
@@ -186,10 +188,19 @@ def order_confirmation(request, order_id):
         order_items = order.items.all()
         total = sum(item.price * item.quantity for item in order_items)
 
+        if request.method == 'POST':
+            form = DeliveryForm(request.POST, instance=order)
+            if form.is_valid():
+                form.save()
+                return redirect('my_flower_del:checkout')
+        else:
+            form = DeliveryForm(instance=order)
+
         context = {
-            'cart_items': order_items,  # переименовали для совместимости с шаблоном
+            'cart_items': order_items,
             'total': total,
-            'order': order
+            'order': order,
+            'form': form
         }
         return render(request, 'my_flower_del/order_confirmation.html', context)
     except Order.DoesNotExist:
@@ -253,6 +264,9 @@ def product_detail(request, product_id):
 
 # Корзина
 def cart(request):
+    if not request.user.is_authenticated:
+        return redirect('my_flower_del:index')
+
     # Сначала получаем корзину пользователя
     cart = Cart.objects.filter(user=request.user).first()
     cart_items = []
@@ -295,3 +309,5 @@ def add_comment(request, product_id):
             return redirect('my_flower_del:product_detail', product_id=product_id)
     else:
         return redirect('my_flower_del:product_detail', product_id=product_id)
+
+

@@ -1,12 +1,13 @@
 
 {% extends 'my_flower_del/layout.html' %}
 
+{% block title %}
+    <title>{{ product.name }}</title>
+{% endblock %}
 
     {% block content %}
         <div class="row">
             <div class="col-md-6 mt-5">
-                <!-- содержимое страницы products -->
-                <!--{% block title %} {{ product.name }} {% endblock %}-->
                 <img src="{{ product.image.url }}" alt="{{ product.title }}">
             </div>
             <div class="col-md-6 mt-5">
@@ -65,8 +66,25 @@
             <br>
             <br>
         </div>
-    {% endblock %}
+
     <script>
+    function showNotification(message) {
+        // Создаем элемент уведомления
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        // Показываем уведомление
+        notification.style.display = 'block';
+
+        // Скрываем через 3 секунды
+        setTimeout(() => {
+            notification.style.display = 'none';
+            notification.remove();
+        }, 3000);
+    }
+
     document.querySelector('.add-to-cart-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -81,13 +99,16 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);  // или более красивое уведомление
+                showNotification(data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Произошла ошибка при добавлении товара в корзину');
+            showNotification('Произошла ошибка при добавлении товара в корзину');
         });
     });
     </script>
+
+    {% endblock %}
+
 

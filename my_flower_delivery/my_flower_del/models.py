@@ -5,11 +5,8 @@ from django.utils.timezone import now
 from django import forms
 
 
-
 class User(AbstractUser):  # Наследуем встроенную модель AbstractUser
     email = models.EmailField(unique=True)  # Поле email становится уникальным
-
-
 
 
 class Product(models.Model):
@@ -32,8 +29,6 @@ class Product(models.Model):
         return self.name
 
 
-
-
 # Затем определяем Order и связанные модели
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -49,7 +44,14 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    notes = models.TextField(blank=True, null=True)
+
+    # Новые поля для доставки
+    delivery_address = models.CharField(max_length=255, default="Not provided")
+    delivery_date = models.DateField(default=now)
+    delivery_time = models.TimeField(default=now)
+    recipient_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20, default="000-000-0000")
+    delivery_notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'Order {self.id}'

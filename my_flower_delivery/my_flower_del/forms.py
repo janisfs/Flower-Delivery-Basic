@@ -1,4 +1,6 @@
 from django import forms
+from .models import Order
+from datetime import datetime, timedelta
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import (
     User,
@@ -62,3 +64,45 @@ class CartItemForm(forms.ModelForm):
         model = CartItem
         fields = ['product', 'quantity']
 
+
+class DeliveryForm(forms.ModelForm):
+    delivery_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label='Дата доставки'
+    )
+    delivery_time = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'}),
+        label='Время доставки'
+    )
+
+    class Meta:
+        model = Order
+        fields = ['recipient_name', 'phone_number', 'delivery_address',
+                  'delivery_date', 'delivery_time', 'delivery_notes']
+        labels = {
+            'recipient_name': 'Имя получателя',
+            'phone_number': 'Номер телефона',
+            'delivery_address': 'Адрес доставки',
+            'delivery_notes': 'Примечания к доставке'
+        }
+
+    def clean_delivery_date(self):
+        date = self.cleaned_data['delivery_date']
+        today = datetime.now().date()
+
+        if date < today:
+            raise forms.ValidationError('Дата доставки не может быть в прошлом')
+
+        if date > today + timedelta(days=14):
+            raise forms.ValidationError('Доставка возможна только в течение следующих 14 дней')
+
+        return date
+
+    def clean_delivery_time(self):
+        time = self.cleaned_data['delivery_time']
+
+        # Проверка рабочего времени (9:00 - 21:00)
+        if time.hour < 9 or time.hour >= 21:
+            raise forms.ValidationError('Доставка возможна только с 9:00 до 21:00')
+
+        return time
