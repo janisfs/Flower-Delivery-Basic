@@ -126,10 +126,18 @@ STATICFILES_DIRS = [BASE_DIR / "my_flower_del/static"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 AUTH_USER_MODEL = 'my_flower_del.User'
+
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# settings.py (добавить)
+TELEGRAM_BOT_TOKEN = '7840150552:AAGAzxoppLN7MrIBw4lzIWzLVvjXdEabW4Y'  # Получите у @BotFather
+TELEGRAM_CHAT_ID = 'ид_вашего_чата'    # Получите после первого запуска бота

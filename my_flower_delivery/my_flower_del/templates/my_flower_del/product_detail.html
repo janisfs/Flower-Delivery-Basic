@@ -5,7 +5,7 @@
     <title>{{ product.name }}</title>
 {% endblock %}
 
-    {% block content %}
+{% block content %}
         <div class="row">
             <div class="col-md-6 mt-5">
                 <img src="{{ product.image.url }}" alt="{{ product.title }}">
@@ -67,18 +67,30 @@
             <br>
         </div>
 
+    <style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 4px;
+        z-index: 1050;
+        display: none;
+    }
+    </style>
+
     <script>
     function showNotification(message) {
-        // Создаем элемент уведомления
+        // Оставляем вашу существующую функцию showNotification без изменений
         const notification = document.createElement('div');
         notification.className = 'notification';
         notification.textContent = message;
         document.body.appendChild(notification);
 
-        // Показываем уведомление
         notification.style.display = 'block';
 
-        // Скрываем через 3 секунды
         setTimeout(() => {
             notification.style.display = 'none';
             notification.remove();
@@ -108,7 +120,7 @@
         });
     });
     </script>
+{% endblock %}
 
-    {% endblock %}
 
 

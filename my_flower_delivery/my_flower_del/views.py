@@ -139,14 +139,14 @@ def add_to_cart(request, product_id):
                 cart_item.save()
 
             # Возвращаем JSON-ответ вместо редиректа
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # Проверка на AJAX запрос
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
-                    'success': True,
-                    'message': f'Товар "{product.name}" успешно добавлен в корзину!'
+                    'status': 'success',
+                    'message': 'Товар успешно добавлен в корзину'
                 })
             else:
-                # Для обычного POST-запроса делаем редирект как раньше
-                return redirect('my_flower_del:product_detail', product_id=product_id)
+                messages.success(request, 'Товар успешно добавлен в корзину')
+                return redirect('my_flower_del:cart')
     else:
         form = AddToCartForm()
 
@@ -192,6 +192,16 @@ def order_confirmation(request, order_id):
             form = DeliveryForm(request.POST, instance=order)
             if form.is_valid():
                 form.save()
+                # Добавляем сообщение об успешном оформлении заказа
+                messages.success(
+                    request,
+                    f'Заказ №{order.id} успешно оформлен! Спасибо за покупку!'
+                )
+                # Очищаем корзину после оформления заказа
+                if 'cart' in request.session:
+                    del request.session['cart']
+                    request.session.modified = True
+
                 return redirect('my_flower_del:checkout')
         else:
             form = DeliveryForm(instance=order)
@@ -204,6 +214,7 @@ def order_confirmation(request, order_id):
         }
         return render(request, 'my_flower_del/order_confirmation.html', context)
     except Order.DoesNotExist:
+        messages.error(request, 'Заказ не найден')
         return redirect('my_flower_del:cart')
 
 
@@ -311,3 +322,6 @@ def add_comment(request, product_id):
         return redirect('my_flower_del:product_detail', product_id=product_id)
 
 
+def order_success(request, order_id):
+    messages.success(request, 'Ваш заказ успешно оформлен! Номер заказа: {}'.format(order_id))
+    return redirect('order_detail', order_id=order_id)
