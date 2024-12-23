@@ -192,7 +192,7 @@ def order_confirmation(request, order_id):
             form = DeliveryForm(request.POST, instance=order)
             if form.is_valid():
                 order = form.save(commit=False)
-                order.status = 'confirmed'  # Добавляем изменение статуса
+                order.status = 'confirmed'
                 order.save()
 
                 messages.success(
@@ -204,7 +204,7 @@ def order_confirmation(request, order_id):
                     del request.session['cart']
                     request.session.modified = True
 
-                return redirect('my_flower_del:checkout')
+                return redirect('my_flower_del:index')
         else:
             form = DeliveryForm(instance=order)
 
@@ -218,6 +218,7 @@ def order_confirmation(request, order_id):
     except Order.DoesNotExist:
         messages.error(request, 'Заказ не найден')
         return redirect('my_flower_del:cart')
+
 
 
 # Каталог
