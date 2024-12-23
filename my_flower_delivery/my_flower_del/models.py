@@ -3,6 +3,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
 from django import forms
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from asgiref.sync import async_to_sync
+from .bot_notifications import notify_about_order
+
 
 
 class User(AbstractUser):  # Наследуем встроенную модель AbstractUser
@@ -34,6 +39,7 @@ class Order(models.Model):
     STATUS_CHOICES = (
         ('pending', 'В обработке'),
         ('paid', 'Оплачен'),
+        ('confirmed', 'Подтвержден'),
         ('shipped', 'Отправлен'),
         ('delivered', 'Доставлен'),
         ('cancelled', 'Отменен')
@@ -52,6 +58,7 @@ class Order(models.Model):
     recipient_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20, default="000-000-0000")
     delivery_notes = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return f'Order {self.id}'
@@ -160,3 +167,11 @@ class CartItem(models.Model):
 
 class AddToCartForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, initial=1, label="Количество")
+
+
+@receiver(post_save, sender=Order)
+def order_notification(sender, instance, created, **kwargs):
+    print(f"Текущий статус заказа: {instance.status}")  # для отладки
+    if instance.status == 'confirmed':
+        from .bot_notifications import notify_about_order
+        async_to_sync(notify_about_order)(instance)

@@ -13,16 +13,16 @@
           <a class="nav-link" href="{% url 'my_flower_del:account' %}" {% if not user.is_authenticated %} style="display: none;" {% endif %}>Аккаунт</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'my_flower_del:logout' %}" {% if not user.is_authenticated %} style="display: none;" {% endif %}>Выход</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'my_flower_del:login' %}" {% if user.is_authenticated %} style="display: none;" {% endif %}>Вход</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="{% url 'my_flower_del:register' %}" {% if user.is_authenticated %} style="display: none;" {% endif %}>Регистрация</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'my_flower_del:cart' %}">Корзина</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'my_flower_del:logout' %}" {% if not user.is_authenticated %} style="display: none;" {% endif %}>Выход</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'my_flower_del:login' %}" {% if user.is_authenticated %} style="display: none;" {% endif %}>Вход</a>
         </li>
       </ul>
       <form class="d-flex" role="search">

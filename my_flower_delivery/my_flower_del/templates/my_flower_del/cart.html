@@ -4,7 +4,7 @@
 
     {% block content %}
     <div class="container py-2">
-        <h1>Корзина</h1>
+        <h1 class="text-warning">Корзина</h1>
         <br>
         {% if cart_items %}
             <ul class="list-group">
@@ -35,6 +35,9 @@
         {% else %}
             <p>Ваша корзина пуста</p>
         {% endif %}
+        <br>
+        <a href="{% url 'my_flower_del:index' %}" class="btn btn-outline-info">На Главную</a>
+        <br>
     </div>
     {% endblock %}
 

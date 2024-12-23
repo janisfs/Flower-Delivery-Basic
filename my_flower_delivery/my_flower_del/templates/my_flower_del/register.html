@@ -7,15 +7,18 @@
 
     {% block content %}
     <div class="container py-2">
-        <h1 class="mb-4 text-center text-primary">Регистрация</h1>
+        <h1 class="mb-4 text-warning">Регистрация</h1>
     </div>
     <div class="container">
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <br>
-            <button type="submit" class="btn btn-outline-info">Регистрация</button>
+            <button type="submit" class="btn btn btn-primary">Регистрация</button>
         </form>
+        <br>
+        <a href="{% url 'my_flower_del:login' %}" class="btn btn-outline-info">Войти</a>
+        <br>
+
     </div>
-    <br>
     {% endblock %}

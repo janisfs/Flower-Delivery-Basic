@@ -191,13 +191,15 @@ def order_confirmation(request, order_id):
         if request.method == 'POST':
             form = DeliveryForm(request.POST, instance=order)
             if form.is_valid():
-                form.save()
-                # Добавляем сообщение об успешном оформлении заказа
+                order = form.save(commit=False)
+                order.status = 'confirmed'  # Добавляем изменение статуса
+                order.save()
+
                 messages.success(
                     request,
                     f'Заказ №{order.id} успешно оформлен! Спасибо за покупку!'
                 )
-                # Очищаем корзину после оформления заказа
+
                 if 'cart' in request.session:
                     del request.session['cart']
                     request.session.modified = True

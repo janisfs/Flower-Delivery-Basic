@@ -1,19 +1,18 @@
-<!DOCTYPE html>
+
 {% extends 'my_flower_del/layout.html' %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+
     {% block title %}
         <title>Аккаунт</title>
     {% endblock %}
-</head>
-<body>
+
     {% block content %}
-        <div class="container">
-            <h1>Аккаунт</h1>
+        <div class="container py-2">
+            <h1 class="text-warning">Профиль пользователя</h1>
+            <br>
             <p>Имя пользователя: {{ user.username }}</p>
             <p>Email: {{ user.email }}</p>
         </div>
+        <br>
     {% endblock %}
 
 </body>

@@ -138,6 +138,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-# settings.py (добавить)
+# settings.py
 TELEGRAM_BOT_TOKEN = '7840150552:AAGAzxoppLN7MrIBw4lzIWzLVvjXdEabW4Y'  # Получите у @BotFather
-TELEGRAM_CHAT_ID = 'ид_вашего_чата'    # Получите после первого запуска бота
+TELEGRAM_CHAT_ID = '319747483'    # Получите после первого запуска бота
