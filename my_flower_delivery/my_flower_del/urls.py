@@ -2,6 +2,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import OrderHistoryView
 from . import views
 
 app_name = 'my_flower_del'
@@ -20,6 +21,7 @@ urlpatterns = [
     path('<int:product_id>/', views.product_detail, name='product_detail'),
     path('<int:product_id>/add_comment/', views.add_comment, name='add_comment'),
     path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('orders/history/', OrderHistoryView.as_view(), name='order_history'),
 ]
 
 if settings.DEBUG:

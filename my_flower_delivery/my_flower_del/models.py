@@ -6,6 +6,7 @@ from django import forms
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from asgiref.sync import async_to_sync
+from django.contrib.auth.models import User
 from .bot_notifications import notify_about_order
 
 
@@ -175,3 +176,30 @@ def order_notification(sender, instance, created, **kwargs):
     if instance.status == 'confirmed':
         from .bot_notifications import notify_about_order
         async_to_sync(notify_about_order)(instance)
+
+
+class FlowerOrder(models.Model):
+    STATUS_CHOICES = [
+        ('new', 'Новый заказ'),
+        ('confirmed', 'Подтвержден'),
+        ('assembly', 'Сборка букета'),
+        ('delivery', 'В доставке'),
+        ('completed', 'Доставлен'),
+        ('cancelled', 'Отменён')
+    ]
+
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Клиент')
+    order_number = models.CharField(max_length=10, unique=True, verbose_name='Номер заказа')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, verbose_name='Статус')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    delivery_datetime = models.DateTimeField(verbose_name='Дата и время доставки')
+    delivery_address = models.TextField(verbose_name='Адрес доставки')
+    recipient_name = models.CharField(max_length=100, verbose_name='Имя получателя')
+    recipient_phone = models.CharField(max_length=20, verbose_name='Телефон получателя')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма заказа')
+    comment = models.TextField(blank=True, null=True, verbose_name='Комментарий к заказу')
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'

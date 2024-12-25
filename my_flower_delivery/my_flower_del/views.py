@@ -8,6 +8,12 @@ from django.contrib.auth.decorators import login_required
 from .forms import CommentForm, DeliveryForm
 from django.http import JsonResponse
 from django.contrib import messages
+from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+from datetime import datetime, timedelta
+from django.utils import timezone
+
 
 
 # Главная страница
@@ -328,3 +334,48 @@ def add_comment(request, product_id):
 def order_success(request, order_id):
     messages.success(request, 'Ваш заказ успешно оформлен! Номер заказа: {}'.format(order_id))
     return redirect('order_detail', order_id=order_id)
+
+
+class OrderHistoryView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'my_flower_del/order_history.html'
+    context_object_name = 'orders'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(user=self.request.user)  # вместо customer используем user
+        return queryset
+
+        # Фильтрация по периоду
+        period = self.request.GET.get('period')
+        if period:
+            today = timezone.now()
+            if period == 'week':
+                start_date = today - timedelta(days=7)
+            elif period == 'month':
+                start_date = today - timedelta(days=30)
+            elif period == 'year':
+                start_date = today - timedelta(days=365)
+            queryset = queryset.filter(created_at__gte=start_date)
+
+        # Поиск по номеру заказа или получателю
+        search_query = self.request.GET.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(order_number__icontains=search_query) |
+                Q(recipient_name__icontains=search_query)
+            )
+
+        # Фильтрация по статусу
+        status = self.request.GET.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_period'] = self.request.GET.get('period', '')
+        context['current_status'] = self.request.GET.get('status', '')
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
