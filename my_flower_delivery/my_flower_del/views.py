@@ -343,7 +343,7 @@ class OrderHistoryView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = Order.objects.filter(user=self.request.user)  # вместо customer используем user
+        queryset = Order.objects.filter(user=self.request.user).order_by('-created_at')
         return queryset
 
         # Фильтрация по периоду

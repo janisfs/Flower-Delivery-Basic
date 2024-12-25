@@ -6,6 +6,7 @@ from django import forms
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from asgiref.sync import async_to_sync
+from django.utils import timezone
 from django.contrib.auth.models import User
 from .bot_notifications import notify_about_order
 
@@ -37,6 +38,7 @@ class Product(models.Model):
 
 # Затем определяем Order и связанные модели
 class Order(models.Model):
+    order_number = models.CharField(max_length=50, blank=True, null=True, default=None)
     STATUS_CHOICES = (
         ('pending', 'В обработке'),
         ('paid', 'Оплачен'),
@@ -59,6 +61,17 @@ class Order(models.Model):
     recipient_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20, default="000-000-0000")
     delivery_notes = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            last_order = Order.objects.order_by('-id').first()
+            if last_order:
+                last_number = int(last_order.order_number.split('-')[-1]) if last_order.order_number else 0
+                new_number = last_number + 1
+            else:
+                new_number = 1
+            self.order_number = f"ORDER-{timezone.now().year}-{new_number:05d}"
+        super().save(*args, **kwargs)
 
 
     def __str__(self):
