@@ -11,9 +11,9 @@
         <div class="flex gap-4">
             <select name="period" class="form-select">
                 <option value="">Все время</option>
-                <option value="week" {% if current_period == 'week' %} selected{% endif %}>За неделю</option>
-                <option value="month" {% if current_period == 'month' %} selected{% endif %}>За месяц</option>
-                <option value="year" {% if current_period == 'year' %} selected{% endif %}>За год</option>
+                <option value="week" {% if current_period == 'week' %}selected="selected"{% endif %}>За неделю</option>
+                <option value="month" {% if current_period == 'month' %}selected="selected"{% endif %}>За месяц</option>
+                <option value="year" {% if current_period == 'year' %}selected="selected"{% endif %}>За год</option>
             </select>
             <br>
             <select name="status" class="form-select">
